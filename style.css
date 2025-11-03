@@ -1,0 +1,285 @@
+/* ---------------------- ROOT VARIABLES ----------------------
+   Define reusable color and theme variables for the entire project
+   -------------------------------------------------------------- */
+:root {
+  --bg: #0b1320;          /* Main background color */
+  --panel: #111a2b;       /* Panel background color (cards, sections) */
+  --ink: #e6f0ff;         /* Primary text color */
+  --muted: #9bb3d1;       /* Secondary (muted) text color */
+  --accent: #5aa9ff;      /* Highlight color (buttons, links) */
+  --accent-2: #9bffb0;    /* Secondary accent (success highlights) */
+  --danger: #ff6b6b;      /* Error / Delete button color */
+  --warn: #ffd166;        /* Warning / highlight color */
+  --grid: #22314d;        /* Grid line color for Gantt chart */
+}
+
+/* Reset element sizing to include borders/padding */
+* { box-sizing: border-box; }
+
+/* ---------------------- GLOBAL STYLES ---------------------- */
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+               "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ---------------------- HEADER ---------------------- */
+header {
+  padding: 20px clamp(16px, 3vw, 32px);
+  border-bottom: 1px solid #17243a;
+  background: linear-gradient(180deg, #0d1627, transparent);
+  position: sticky;   /* Keeps header fixed while scrolling */
+  top: 0;
+  z-index: 5;
+}
+
+/* Main heading text */
+h1 {
+  margin: 0;
+  font-size: clamp(18px, 2.8vw, 28px);
+  letter-spacing: .2px;
+}
+
+/* ---------------------- PAGE LAYOUT ---------------------- */
+.wrap {
+  padding: 20px clamp(16px, 3vw, 32px);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1.2fr 2fr; /* Two-column layout: left panel smaller */
+  align-items: start;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1024px) {
+  .wrap { grid-template-columns: 1fr; } /* Stack panels vertically */
+}
+
+/* ---------------------- CARD CONTAINERS ---------------------- */
+.card {
+  background: var(--panel);
+  border: 1px solid #17243a;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25); /* Soft drop shadow */
+}
+
+/* Card titles */
+.card h2 {
+  margin: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid #17243a;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* Standard inner padding for card content */
+.pad { padding: 16px; }
+
+/* ---------------------- FORM ELEMENTS ---------------------- */
+label {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Inputs and dropdowns styling */
+select,
+input[type="number"],
+input[type="text"] {
+  width: 100%;
+  background: #0c1423;
+  color: var(--ink);
+  border: 1px solid #1b2a45;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+/* Remove default spinner buttons from number inputs */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ---------------------- GRID HELPERS ---------------------- */
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px; /* Spacing between input fields */
+}
+
+.row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* ---------------------- BUTTONS ---------------------- */
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Spacing between buttons */
+}
+
+/* Base button style */
+button {
+  background: #0f1a2d;
+  color: var(--ink);
+  border: 1px solid #1a2a46;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: .15s transform ease, .15s background ease;
+  font-weight: 600;
+}
+
+/* Hover animation for buttons */
+button:hover {
+  transform: translateY(-1px);
+  background: #12233e;
+}
+
+/* Button variants */
+.primary {
+  background: linear-gradient(180deg, #1f3b6b, #142847);
+  border-color: #27497c;
+}
+
+.danger {
+  background: linear-gradient(180deg, #5b1f2a, #3a1420);
+  border-color: #7c2734;
+}
+
+.ghost {
+  background: transparent;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+/* ---------------------- CONTROLS & LAYOUT ---------------------- */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(6, max-content) 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.controls button {
+  padding: 10px 12px;
+}
+
+/* Muted / helper text style */
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---------------------- STATS PANEL ---------------------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* Individual stat card */
+.stat {
+  background: #0c1423;
+  border: 1px solid #1b2a45;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+/* Stat label */
+.stat .k {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Stat value */
+.stat .v {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ---------------------- READY QUEUE & CHIPS ---------------------- */
+.queue {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Small tag for queued process (PIDs) */
+.chip {
+  background: #0c1423;
+  border: 1px solid #1b2a45;
+  border-radius: 999px; /* Makes it pill-shaped */
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* ---------------------- GANTT CHART ---------------------- */
+canvas {
+  width: 100%;
+  height: 280px;
+  display: block;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* ---------------------- FOOTER ---------------------- */
+.footer {
+  padding: 8px 16px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Time axis labels below Gantt chart */
+.time-axis {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Horizontal divider line */
+.hr {
+  height: 1px;
+  background: #17243a;
+  margin: 12px 0;
+}
+
+/* ---------------------- TABLE STYLES ---------------------- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Table cell and header styling */
+.table th,
+.table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px dashed #1b2a45;
+  font-size: 13px;
+}
+
+/* Table header text color */
+.table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Right-aligned table cells */
+.right { text-align: right; }
+
+/* Small note text (tips, hints) */
+.note {
+  font-size: 11px;
+  color: var(--muted);
+}

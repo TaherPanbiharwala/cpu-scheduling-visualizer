@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPU Scheduling Visualizer — FCFS • SJF • Round Robin</title>
+  <!-- Linking the external stylesheet for UI design -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- ---------------- HEADER SECTION ---------------- -->
+  <header>
+    <!-- Main Title -->
+    <h1>CPU Scheduling Visualizer — FCFS • SJF • Round Robin</h1>
+    <!-- Subtitle describing the app capabilities -->
+    <div class="muted">Fully client-side • No frameworks • Canvas animations • Export trace/screenshot</div>
+  </header>
+
+  <!-- ---------------- MAIN CONTENT WRAPPER ---------------- -->
+  <main class="wrap">
+
+    <!-- ===== LEFT PANEL : SIMULATION SETUP ===== -->
+    <section class="card">
+      <h2>Simulation Setup</h2>
+      <div class="pad">
+
+        <!-- --- Algorithm & Simulation Controls --- -->
+        <div class="row-3" style="margin-bottom: 12px;">
+          <!-- Dropdown to select algorithm -->
+          <div>
+            <label>Algorithm</label>
+            <select id="algo">
+              <option value="FCFS">FCFS (First Come First Served)</option>
+              <option value="SJF">SJF (Non-preemptive)</option>
+              <option value="RR">Round Robin</option>
+            </select>
+          </div>
+
+          <!-- Input for quantum (used only in Round Robin) -->
+          <div>
+            <label>Quantum (for RR)</label>
+            <input id="quantum" type="number" min="1" value="3" />
+          </div>
+
+          <!-- Starting time for animation (does not affect actual results) -->
+          <div>
+            <label>Start at t =</label>
+            <input id="startAt" type="number" min="0" value="0" />
+          </div>
+        </div>
+
+        <!-- --- Process Input Fields --- -->
+        <div class="row" style="margin-bottom: 8px;">
+          <div>
+            <label>PID</label>
+            <input id="pid" type="text" placeholder="P1" />
+          </div>
+          <div>
+            <label>Arrival Time</label>
+            <input id="arrival" type="number" min="0" value="0" />
+          </div>
+          <div>
+            <label>Burst Time</label>
+            <input id="burst" type="number" min="1" value="5" />
+          </div>
+          <div>
+            <label>Priority (optional)</label>
+            <input id="priority" type="number" value="0" />
+          </div>
+        </div>
+
+        <!-- --- Buttons for Adding / Loading / Clearing Processes --- -->
+        <div class="btns" style="margin-bottom: 14px;">
+          <button class="primary" id="addProc">Add Process</button>
+          <button id="sample">Load Sample</button>
+          <button class="ghost" id="clearList">Clear</button>
+        </div>
+
+        <!-- --- Table to Display Added Processes --- -->
+        <table class="table" id="procTable">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Arrival</th>
+              <th>Burst</th>
+              <th>Priority</th>
+              <th class="right">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="hr"></div>
+
+        <!-- --- Simulation Control Buttons --- -->
+        <div class="controls">
+          <button class="primary" id="build">Build Schedule</button>
+          <button id="play">▶ Play</button>
+          <button id="pause">⏸ Pause</button>
+          <button id="step">⏩ Step</button>
+          <button id="reset">⟲ Reset</button>
+          <span class="muted" style="margin-left:8px;">Speed</span>
+          <!-- Slider to control playback speed -->
+          <input id="speed" type="range" min="0.25" max="4" step="0.25" value="1" />
+        </div>
+
+        <!-- --- Export Buttons for PNG / Trace JSON --- -->
+        <div style="margin-top: 12px;" class="btns">
+          <button id="exportPng">Export Screenshot</button>
+          <button id="exportTrace">Export Trace</button>
+        </div>
+
+        <!-- --- Instruction Note --- -->
+        <p class="note" style="margin-top:10px;">
+          Tip: Use <b>Load Sample</b> then <b>Build Schedule</b>, hit <b>Play</b>, 
+          and adjust <b>Speed</b>. Use <b>Step</b> for frame-by-frame.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== RIGHT PANEL : VISUALIZATION & STATS ===== -->
+    <section class="card" style="overflow:hidden;">
+      <h2>Timeline & Queues</h2>
+      <div class="pad">
+
+        <!-- --- Real-time Stats Display --- -->
+        <div class="stat-grid">
+          <div class="stat">
+            <div class="k">Current Time</div>
+            <div class="v" id="curTime">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">CPU Utilization</div>
+            <div class="v" id="cpuUtil">–</div>
+          </div>
+          <div class="stat">
+            <div class="k">Throughput</div>
+            <div class="v" id="throughput">–</div>
+          </div>
+        </div>
+
+        <!-- --- Ready Queue Display --- -->
+        <div style="margin-top:12px;">
+          <div class="k muted" style="margin-bottom:6px;">Ready Queue</div>
+          <div class="queue" id="readyQueue"></div>
+        </div>
+
+        <!-- --- Per-Process Statistics Table --- -->
+        <div style="margin-top:12px;">
+          <div class="k muted" style="margin-bottom:6px;">Per-Process Stats</div>
+          <table class="table" id="statsTable">
+            <thead>
+              <tr>
+                <th>PID</th>
+                <th>Arrival</th>
+                <th>Burst</th>
+                <th>Start</th>
+                <th>Finish</th>
+                <th>Waiting</th>
+                <th>Turnaround</th>
+                <th>Response</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- --- Canvas for Drawing Gantt Chart --- -->
+      <canvas id="gantt" width="1400" height="280" aria-label="Gantt Chart"></canvas>
+
+      <!-- --- Footer Section: Time Axis and Description --- -->
+      <div class="footer">
+        <div class="time-axis" id="axis">t: 0</div>
+        <div class="muted">Bars = execution quanta • Grid = time units • Grey = idle</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Linking external JS file that contains scheduling logic and animation code -->
+  <script src="script.js"></script>
+</body>
+</html>
