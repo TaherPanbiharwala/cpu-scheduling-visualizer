@@ -153,10 +153,3 @@ This makes it useful for **reporting**, **debugging**, or **further analysis** i
 No external libraries or frameworks are used.
 
 ---
-
-## 📂 File Structure
-
-Currently everything is bundled into a single file:
-
-```text
-index.html    # Full application: markup, styles, and JavaScript
