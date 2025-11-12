@@ -212,7 +212,7 @@ function computeStatsFromTimeline() {
   const firstStart = {}, finish = {}, burst = {}, arrival = {};
   state.procs.forEach(p => { burst[p.pid] = p.burst; arrival[p.pid] = p.arrival; });
 
-  // Extract start and finish times from timeline
+  // Extract first start and finish times from the built timeline
   for (const seg of state.timeline) {
     if (!seg.pid) continue;
     if (!(seg.pid in firstStart)) firstStart[seg.pid] = seg.start;
@@ -234,13 +234,26 @@ function computeStatsFromTimeline() {
     if (st.start != null) st.resp = st.start - arr; // Response Time = Start - Arrival
   });
 
-  // CPU Utilization & Throughput
-  const busy = state.timeline.reduce((a, seg) => a + (seg.pid ? (seg.end - seg.start) : 0), 0);
-  const total = (state.tEnd - state.t0) || 1;
-  const util = busy / total;
+  // ------- NEW: Averages -------
+  const all = Object.values(state.stats);
+  const n = all.length || 1;
 
-  $('#cpuUtil').textContent = (util * 100).toFixed(1) + '%';
-  $('#throughput').textContent = (Object.keys(state.stats).length / total).toFixed(3) + ' jobs/unit time';
+  // Sum over all processes (they should all be finished after schedule build)
+  const sumTat = all.reduce((s, p) => s + (Number.isFinite(p.tat) ? p.tat : 0), 0);
+  const sumWait = all.reduce((s, p) => s + (Number.isFinite(p.waiting) ? p.waiting : 0), 0);
+
+  const avgTat = sumTat / n;
+  const avgWait = sumWait / n;
+
+  // Display averages
+  $('#avgTAT').textContent = avgTat.toFixed(2);
+  $('#avgWT').textContent  = avgWait.toFixed(2);
+
+  // Keep throughput (jobs per unit time)
+  const totalSpan = (state.tEnd - state.t0) || 1;
+  $('#throughput').textContent = (n / totalSpan).toFixed(3) + ' jobs/unit time';
+
+  // Removed: CPU Utilization calculation and DOM update
 }
 
 // =========================================================
